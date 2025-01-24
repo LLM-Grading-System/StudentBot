@@ -5,7 +5,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, KeyboardButton, ReplyKeyboardMarkup
 from src.constants import COMPLAINT_TEXT, CONFIRM_TEXT, EDIT_TEXT, EXIT_TEXT
 from src.bootstrap import Bootstrap
-from src.routers.basics import main_menu_keyboard
 
 router = Router()
 
@@ -91,10 +90,5 @@ async def confirm_complaint(message: Message, state: FSMContext, bootstrap: Boot
     or StateFilter(ComplaintState.waiting_for_description)
 )
 async def handle_incorrect_type_sent_data(message: Message, state: FSMContext) -> None:
-    if message.text == EXIT_TEXT:
-        await state.clear()
-        text = "Вы вышли из режима создания заявки..."
-        await message.answer(text, reply_markup=main_menu_keyboard)
-        return
     text = "Похоже, что вы отправили что-то не то!\nПопробуйте еще раз"
     await message.answer(text)

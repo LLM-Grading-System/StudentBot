@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
 from src.constants import GITHUB_TEXT, EXIT_TEXT
 from src.bootstrap import Bootstrap
-from src.routers.basics import main_menu_keyboard
+from src.handlers.basics import main_menu_keyboard
 
 
 router = Router()
@@ -45,8 +45,9 @@ async def handle_github_username(message: Message, state: FSMContext, bootstrap:
 
 
 @router.message(StateFilter(GithubBindingState.waiting_github_username))
-async def handle_incorrect_type_sent_data(message: Message) -> None:
+async def handle_incorrect_type_sent_data(message: Message, state: FSMContext) -> None:
     if message.text == EXIT_TEXT:
+        await state.clear()
         text = "Вы вышли из режима привязки GitHub-аккаунта..."
         await message.answer(text, reply_markup=main_menu_keyboard)
         return

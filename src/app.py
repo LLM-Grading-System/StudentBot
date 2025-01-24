@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from faststream import FastStream
 from faststream.redis import RedisBroker
-from src.handlers import basics_router, complaint_router, other_router, github_binding_router
+from src.handlers import basics_router, complaint_router, other_router, github_binding_router, statistics_router
 from src.bootstrap import get_test_bootstrap
 
 
@@ -36,7 +36,7 @@ async def stop_bot():
 async def main():
     # await app.start()
     dp.include_routers(
-        basics_router, complaint_router, github_binding_router,
+        basics_router, complaint_router, github_binding_router, statistics_router,
         other_router
     )
     dp.shutdown.register(stop_bot)
