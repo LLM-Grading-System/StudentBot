@@ -1,27 +1,13 @@
 from aiogram import Router
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
-from src.constants import COMPLAINT_TEXT, GITHUB_TEXT, STATS_TEXT, MENU_COMMAND, LEADERBOARD_TEXT
+from aiogram.types import Message
+from src.infrastructure.aiogram.constants import MENU_COMMAND
 from src.bootstrap import Bootstrap
+from src.infrastructure.aiogram.keyboards import main_menu_keyboard
 from src.services import StudentNotFoundError
 
 router = Router()
-
-
-main_menu_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton(text=GITHUB_TEXT),
-            KeyboardButton(text=STATS_TEXT),
-        ],
-        [
-            KeyboardButton(text=COMPLAINT_TEXT),
-            KeyboardButton(text=LEADERBOARD_TEXT),
-        ]
-    ],
-    resize_keyboard=True,
-)
 
 
 @router.message(CommandStart())

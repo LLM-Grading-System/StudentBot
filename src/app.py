@@ -8,14 +8,14 @@ from pydantic import BaseModel, Field
 from faststream import FastStream
 from faststream.redis import RedisBroker
 from src.handlers import basics_router, complaint_router, other_router, github_binding_router, statistics_router
-from src.bootstrap import get_test_bootstrap
-
+from src.bootstrap import get_bootstrap
+from src.settings import app_settings
 
 load_dotenv()
 
 # broker = RedisBroker(os.environ["REDIS_URL"])
 # app = FastStream(broker)
-bot = Bot(token=os.environ["BOT_TOKEN"])
+bot = Bot(token=app_settings.BOT_TOKEN)
 dp = Dispatcher()
 
 
@@ -40,7 +40,7 @@ async def main():
         other_router
     )
     dp.shutdown.register(stop_bot)
-    dp.workflow_data.update({"bootstrap": get_test_bootstrap()})
+    dp.workflow_data.update({"bootstrap": get_bootstrap()})
     try:
         await dp.start_polling(bot)
     except Exception as ex:

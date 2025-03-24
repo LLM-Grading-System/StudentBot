@@ -3,8 +3,9 @@ from aiogram import Router, F
 from aiogram.filters import StateFilter, or_f, and_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, KeyboardButton, ReplyKeyboardMarkup
-from src.constants import COMPLAINT_TEXT, CONFIRM_TEXT, EDIT_TEXT, EXIT_TEXT
+from src.infrastructure.aiogram.constants import COMPLAINT_TEXT, CONFIRM_TEXT, EDIT_TEXT, EXIT_TEXT
 from src.bootstrap import Bootstrap
+from src.infrastructure.aiogram.keyboards import main_menu_keyboard
 
 router = Router()
 
@@ -79,10 +80,29 @@ async def confirm_complaint(message: Message, state: FSMContext, bootstrap: Boot
     state_data = await state.get_data()
     task_id = state_data["task_id"]
     description = state_data["description"]
-    await bootstrap.task_service.create_complaint_by_task(task_id, description)
+    await bootstrap.task_service.create_complaint_by_task(message.from_user.id, task_id, description)
     text = "Ваша заявка успешно отправлена! \nПреподаватель ее скоро рассмотрит!"
     await state.clear()
     await message.answer(text, reply_markup=ReplyKeyboardRemove())
+
+
+@router.message(
+    and_f(
+        or_f(
+            StateFilter(ComplaintState.waiting_for_confirm),
+            StateFilter(ComplaintState.waiting_for_task),
+            StateFilter(ComplaintState.waiting_for_description)
+        ),
+        F.text == EXIT_TEXT
+    )
+)
+async def handle_incorrect_type_sent_data(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer(
+        text="Вы в главном меню",
+        reply_markup=main_menu_keyboard,
+    )
+
 
 
 @router.message(

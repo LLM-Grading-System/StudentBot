@@ -1,12 +1,10 @@
 from aiogram import types
 from aiogram.fsm.state import default_state
-from aiogram.types import ReplyKeyboardRemove
 from aiogram import Router, F
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from src.constants import EXIT_TEXT
-from src.handlers.basics import main_menu_keyboard
-
+from src.infrastructure.aiogram.constants import EXIT_TEXT
+from src.infrastructure.aiogram.keyboards import main_menu_keyboard
 
 router = Router()
 
@@ -25,5 +23,5 @@ async def send_answer(message: types.Message) -> None:
     await message.answer(
         text="Не представляю, что ответить на это!",
         reply_to_message_id=message.message_id,
-        reply_markup=ReplyKeyboardRemove(),
+        reply_markup=main_menu_keyboard,
     )

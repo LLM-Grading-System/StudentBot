@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
-from src.constants import GITHUB_TEXT, EXIT_TEXT
+from src.infrastructure.aiogram.constants import GITHUB_TEXT, EXIT_TEXT
 from src.bootstrap import Bootstrap
 from src.handlers.basics import main_menu_keyboard
 
