@@ -25,21 +25,23 @@ cancel_keyboard = ReplyKeyboardMarkup(
 async def start_github_binding_process(message: Message, state: FSMContext):
     await state.set_state(GithubBindingState.waiting_github_username)
     text = "Введите ваше имя пользователя на GitHub\n"
-    text += "Пожалуйста добавьте на время верификации в своем GitHub-профиле в поле website ссылку на телеграм-аккаунт"
+    text += f"Пожалуйста добавьте на время верификации в своем GitHub-профиле в секции Social accounts ссылку на ваш телеграм-аккаунт: https://t.me/{message.from_user.username}"
     await message.answer(text, reply_markup=cancel_keyboard, parse_mode="HTML")
 
 
 @router.message(StateFilter(GithubBindingState.waiting_github_username), F.text != EXIT_TEXT)
 async def handle_github_username(message: Message, state: FSMContext, bootstrap: Bootstrap) -> None:
     github_username = message.text
+    if github_username.startswith("https://github.com/"):
+        github_username = github_username.split("https://github.com/")[-1]
     is_verified = await bootstrap.github_service.is_verified(github_username, message.from_user.username)
     if is_verified:
         await state.clear()
         await bootstrap.student_service.set_github_username(message.from_user.id, github_username)
-        text = "GitHub-аккаунт успешно подтвержден"
+        text = "GitHub-аккаунт успешно привязан"
         keyboard = main_menu_keyboard
     else:
-        text = "Попробуйте ввести имя пользователя на GitHub снова"
+        text = "Не удалось найти ссылку на ваш телеграм-аккаунт в указанном Github-профиле"
         keyboard = cancel_keyboard
     await message.answer(text, reply_markup=keyboard)
 

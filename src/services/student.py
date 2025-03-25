@@ -1,7 +1,12 @@
 import datetime
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+
+import aiohttp
+
 from src.services.exceptions import StudentAlreadyExistsError, StudentNotFoundError
+from src.settings import app_settings
 
 
 @dataclass
@@ -48,3 +53,42 @@ class TestStudentService(StudentService):
             raise StudentNotFoundError(telegram_user_id)
         student: StudentDTO = self.students[telegram_user_id]
         student.github_username = github_username
+
+
+class APIStudentService(StudentService):
+    def __init__(self):
+        self._endpoint = app_settings.core_api_endpoint
+
+    async def create_student(self, telegram_user_id: int, telegram_username: str) -> None:
+        create_student_endpoint = f"{self._endpoint}/api/students"
+        async with aiohttp.ClientSession() as session:
+            data = {
+                "telegramUserId": telegram_user_id,
+                "telegramUsername": telegram_username
+            }
+            async with session.post(create_student_endpoint, json=data) as res:
+                if res.status == 409:
+                    raise StudentAlreadyExistsError(telegram_user_id)
+                content = await res.text(encoding="utf-8")
+                print(content)
+
+    async def get_student_by_telegram_user_id(self, telegram_user_id: int) -> StudentDTO:
+        get_student_endpoint = f"{self._endpoint}/api/students/{telegram_user_id}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(get_student_endpoint) as res:
+                if res.status == 404:
+                    raise StudentNotFoundError(telegram_user_id)
+                content = await res.text(encoding="utf-8")
+                print(content)
+
+    async def set_github_username(self, telegram_user_id: int, github_username: str) -> None:
+        set_student_github_endpoint = f"{self._endpoint}/api/students/{telegram_user_id}"
+        async with aiohttp.ClientSession() as session:
+            data = {
+                "githubUsername": github_username
+            }
+            async with session.post(set_student_github_endpoint, json=data) as res:
+                if res.status == 404:
+                    raise StudentNotFoundError(telegram_user_id)
+                content = await res.text(encoding="utf-8")
+                print(content)
