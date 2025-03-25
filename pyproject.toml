@@ -1,0 +1,11 @@
+[project]
+name = "aigradingintegration"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiogram>=3.19.0",
+    "faststream[kafka]>=0.5.37",
+    "pydantic-settings>=2.8.1",
+]

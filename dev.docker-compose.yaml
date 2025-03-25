@@ -2,6 +2,7 @@ version: '3.8'
 services:
   cache:
     image: redis:6.2-alpine
+    container_name: dev_redis
     restart: always
     env_file:
       - .env
@@ -14,6 +15,21 @@ services:
       '
     volumes:
       - cache:/data
+
+  bot:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    container_name: dev_bot
+    env_file: ".env"
+    restart: always
+    environment:
+      - API_HOST=host.docker.internal
+      - KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
+
+    volumes:
+      - ./src:/app/src
+
 volumes:
   cache:
     driver: local
