@@ -1,21 +1,5 @@
 version: '3.8'
 services:
-  cache:
-    image: redis:6.2-alpine
-    container_name: dev_redis
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - '6379:6379'
-    command: >
-      sh -c '
-        echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf &&
-        redis-server --save 20 1 --loglevel warning
-      '
-    volumes:
-      - cache:/data
-
   bot:
     build:
       context: .
@@ -26,10 +10,5 @@ services:
     environment:
       - API_HOST=host.docker.internal
       - KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:29092
-
     volumes:
       - ./src:/app/src
-
-volumes:
-  cache:
-    driver: local
