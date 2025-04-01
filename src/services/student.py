@@ -109,7 +109,7 @@ class APIStudentService(StudentService):
                 )
 
     async def set_github_username(self, telegram_user_id: int, github_username: str) -> None:
-        set_student_github_endpoint = f"{self._endpoint}/api/students/{telegram_user_id}"
+        set_student_github_endpoint = f"{self._endpoint}/api/students/telegram/{telegram_user_id}"
         async with aiohttp.ClientSession() as session:
             data = {
                 "githubUsername": github_username
