@@ -8,18 +8,18 @@ class ServiceError(BaseException, ABC):
 
 
 class StudentAlreadyExistsError(ServiceError):
-    def __init__(self, telegram_user_id: int) -> None:
-        self.telegram_user_id = telegram_user_id
+    def __init__(self, telegram_user: int | str) -> None:
+        self.telegram_user = telegram_user
 
     @property
     def message(self) -> str:
-        return f"Пользователь с id={self.telegram_user_id} уже существует"
+        return f"Пользователь с id={self.telegram_user} уже существует"
 
 
 class StudentNotFoundError(ServiceError):
-    def __init__(self, telegram_user_id: int) -> None:
-        self.telegram_user_id = telegram_user_id
+    def __init__(self, telegram_user: int | str) -> None:
+        self.telegram_user = telegram_user
 
     @property
     def message(self) -> str:
-        return f"Пользователь с id={self.telegram_user_id} уже существует"
+        return f"Пользователь с id={self.telegram_user} не существует"

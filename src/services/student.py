@@ -28,6 +28,10 @@ class StudentService(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_student_by_github_username(self, github_username: str) -> StudentDTO:
+        raise NotImplementedError
+
+    @abstractmethod
     async def set_github_username(self, telegram_user_id: int, github_username: str) -> None:
         raise NotImplementedError
 
@@ -73,13 +77,36 @@ class APIStudentService(StudentService):
                 print(content)
 
     async def get_student_by_telegram_user_id(self, telegram_user_id: int) -> StudentDTO:
-        get_student_endpoint = f"{self._endpoint}/api/students/{telegram_user_id}"
+        get_student_endpoint = f"{self._endpoint}/api/students/telegram/{telegram_user_id}"
         async with aiohttp.ClientSession() as session:
             async with session.get(get_student_endpoint) as res:
                 if res.status == 404:
                     raise StudentNotFoundError(telegram_user_id)
                 content = await res.text(encoding="utf-8")
-                print(content)
+                data = json.loads(content)
+                return StudentDTO(
+                    telegram_user_id=data["telegramUserId"],
+                    telegram_username=data["telegramUsername"],
+                    github_username=data["githubUsername"],
+                    joined_at=data["registeredAt"],
+                    has_enabled_notifications=True
+                )
+
+    async def get_student_by_github_username(self, github_username: str) -> StudentDTO:
+        get_student_endpoint = f"{self._endpoint}/api/students/github/{github_username}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(get_student_endpoint) as res:
+                if res.status == 404:
+                    raise StudentNotFoundError(github_username)
+                content = await res.text(encoding="utf-8")
+                data = json.loads(content)
+                return StudentDTO(
+                    telegram_user_id=data["telegramUserId"],
+                    telegram_username=data["telegramUsername"],
+                    github_username=data["githubUsername"],
+                    joined_at=data["registeredAt"],
+                    has_enabled_notifications=True
+                )
 
     async def set_github_username(self, telegram_user_id: int, github_username: str) -> None:
         set_student_github_endpoint = f"{self._endpoint}/api/students/{telegram_user_id}"
@@ -87,7 +114,7 @@ class APIStudentService(StudentService):
             data = {
                 "githubUsername": github_username
             }
-            async with session.post(set_student_github_endpoint, json=data) as res:
+            async with session.put(set_student_github_endpoint, json=data) as res:
                 if res.status == 404:
                     raise StudentNotFoundError(telegram_user_id)
                 content = await res.text(encoding="utf-8")
